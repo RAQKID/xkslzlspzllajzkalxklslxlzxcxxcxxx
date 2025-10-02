@@ -1,18 +1,21 @@
 import express from "express";
-import fetch from "node-fetch"; // If using Node 18+, this is built-in
+import fetch from "node-fetch";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-
-// For JSON requests (if needed)
 app.use(express.json());
 
-// Route: /translate?q=<text>
+// Root route
+app.get("/", (req, res) => {
+  res.send("Running");
+});
+
+// Translate route
 app.get("/translate", async (req, res) => {
   const text = req.query.q;
-  const target = req.query.target || "en"; // default to English
+  const target = req.query.target || "en";
 
   if (!text) return res.status(400).json({ error: "Query parameter 'q' is required." });
 
@@ -25,7 +28,7 @@ app.get("/translate", async (req, res) => {
         target: target,
         format: "text",
         alternatives: 3,
-        api_key: process.env.LIBRE_API_KEY || "" // optional
+        api_key: process.env.LIBRE_API_KEY || ""
       }),
       headers: { "Content-Type": "application/json" }
     });
@@ -38,7 +41,6 @@ app.get("/translate", async (req, res) => {
   }
 });
 
-// Make Vercel use this server
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
 
